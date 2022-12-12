@@ -31,7 +31,7 @@ def get_weather():
     message = []
 
     # 만약 비가 한 번이라도 오면 비가 온다고 알려준다
-    if 'rain' in rain:
+    if 'Rain' in rain or 'Snow' in rain:
         message.append("우산 챙겨라")
     else:
         message.append("비 안옴. 우산 냅두고 가셈")
