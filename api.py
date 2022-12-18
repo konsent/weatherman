@@ -1,4 +1,5 @@
 import requests
+import datetime
 from appid import appid
 
 def get_weather():
@@ -19,7 +20,7 @@ def get_weather():
     weather_url = f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&units=metric&appid={appid}"
     weather_json = requests.get(weather_url)
     daily_weather_json = weather_json.json()["list"]
-
+    
     # 호출시간 기준 3시간 단위로 5번 체감 온도를 파싱한다
     temp = []
     rain = []
@@ -29,12 +30,25 @@ def get_weather():
 
     # 최종 메시지를 담을 리스트를 생성한다
     message = []
+    
+    # 현재 날짜(연/월/일)
+    dt_now = datetime.datetime.now()
+    
+    # 요일 구하기
+    weekday = dt_now.weekday()
+    dateDict = {0: '월요일', 1:'화요일', 2:'수요일', 3:'목요일', 4:'금요일', 5:'토요일', 6:'일요일'}
+    message.append('{}년 {}월 {}일 {}'.format(dt_now.year,dt_now.month,dt_now.day,dateDict[weekday]))
+    
+    # 공백 넣기
+    message.append('\n')
 
     # 만약 비가 한 번이라도 오면 비가 온다고 알려준다
-    if 'Rain' in rain or 'Snow' in rain:
-        message.append("우산 챙겨라")
+    if 'Rain' in rain:
+        message.append("비온다! 우산 챙기기")
+    elif 'Snow' in rain:
+        message.append("눈온다! 우산 챙기기")
     else:
-        message.append("비 안옴. 우산 냅두고 가셈")
+        message.append("우산 필요 없음")
         
     # 평균 체감온도를 계산한다
     avg_temp = (min(temp)+max(temp)) / 2
@@ -44,7 +58,7 @@ def get_weather():
 
     # 온도별 옷차림
     if avg_temp >= 28:
-        message.append("오늘 개더움. 반팔, 반바지 입어라")
+        message.append("엄청 더움. 반팔, 반바지 입어라")
     elif avg_temp >= 23:
         message.append("더움. 반팔, 얇은 셔츠, 반바지 입어라")
     elif avg_temp >= 20:
@@ -56,9 +70,11 @@ def get_weather():
     elif avg_temp >= 9:
         message.append("추워. 자켓, 코트, 잠바, 니트 입어라")
     elif avg_temp >= 5:
-        message.append("좀 춥다. 코트, 잠바, 자켓, 히트텍, 속옷, 니트 입어라")
+        message.append("좀 춥다. 코트, 잠바, 자켓, 히트텍, 니트 입어라")
+    elif avg_temp >= 0:
+        message.append("진짜 춥다. 목도리 필수! 잠바,자켓,히트텍,니트 입어라")
     else:
-        message.append("개추워. 히트텍 무조건! 패딩, 목도리 기모 챙겨입어라")
+        message.append("시베리아임 히트텍 3개 이상 입고 나가셈")
         
     return(message)
 
